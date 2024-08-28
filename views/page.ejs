@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title><%= title %></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <style>
+        .json-collapsible {
+            cursor: pointer;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 10px; /* 顶部间距 */
+            margin-bottom: 10px;
+        }
+        .json-content {
+            display: none;
+            margin-top: 10px; /* 顶部间距 */
+            padding: 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .json-content table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .json-content th, .json-content td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .json-content th {
+            background-color: #f2f2f2;
+        }
+        .json-content.show {
+            display: block;
+        }
+        .section {
+            margin-bottom: 30px; /* 各个部分之间的间距 */
+        }
+        .table-container {
+        width: 100%;
+        table-layout: fixed; /* 固定表格宽度 */
+        }
+        .value-cell {
+            word-wrap: break-word; /* 自动换行 */
+        }
+        .footer {
+        margin-top: 40px;
+        text-align: center; /* Center-align the text */
+        font-size: 14px;
+        color: #6c757d;
+        padding: 20px; /* Optional: Add some padding for better spacing */
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <% if (title !== 'NodInfo') { %>
+            <a href="/" class="btn btn-outline-primary mb-4">Back to Home</a>
+        <% } %>
+        <h1 class="text-center mb-4"><%= title %></h1>
+
+        <!-- Add buttons for system info and neofetch -->
+        <div class="text-center mb-4">
+            <a href="/info" class="btn btn-outline-info mr-2">System Info</a>
+            <a href="/neofetch" class="btn btn-outline-info">Neofetch</a>
+        </div>
+
+        <% if (content) { %>
+            <pre class="bg-light p-3 rounded"><%= content %></pre>
+        <% } else { %>
+            <div class="card">
+                <div class="card-body">
+                    <p><strong>Node.js version:</strong> <%= nodeVersion %></p>
+                    <p><strong>Platform:</strong> <%= platform %></p>
+                    <p><strong>Architecture:</strong> <%= arch %></p>
+                    <p><strong>Free Memory:</strong> <%= freeMemory %> bytes</p>
+                    <p><strong>Total Memory:</strong> <%= totalMemory %> bytes</p>
+                    <p><strong>Home Directory:</strong> <%= homeDir %></p>
+                    <p><strong>Uptime:</strong> <%= uptime %> seconds</p>
+
+                    <!-- CPU Info -->
+                    <div class="json-collapsible">CPU Info</div>
+                    <div class="json-content">
+                        <table class="table table-striped table-container">
+                            <% for (const [key, value] of Object.entries(cpuInfo)) { %>
+                                <tr>
+                                    <td><%= key %></td>
+                                    <td>
+                                        <% if (typeof value === 'object' && value !== null) { %>
+                                            <pre><%= JSON.stringify(value, null, 2) %></pre>
+                                        <% } else { %>
+                                            <%= value %>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </table>
+                    </div>
+
+                    <!-- Network Interfaces -->
+                    <div class="json-collapsible">Network Interfaces</div>
+                    <div class="json-content">
+                        <% if (networkInterfaces && networkInterfaces.length) { %>
+                            <table class="table table-striped table-container">
+                                <thead>
+                                    <tr>
+                                        <th>Property</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% networkInterfaces.forEach(iface => { %>
+                                        <% for (const [key, value] of Object.entries(iface)) { %>
+                                            <tr>
+                                                <td><%= key %></td>
+                                                <td><%= value %></td>
+                                            </tr>
+                                        <% } %>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        <% } else { %>
+                            <p>No network interfaces found.</p>
+                        <% } %>
+                    </div>
+
+                    <!-- Environment Variables -->
+                    <div class="json-collapsible">Environment Variables</div>
+                    <div class="json-content">
+                        <% if (envVars) { %>
+                            <table class="table table-striped table-container">
+                                <thead>
+                                    <tr>
+                                        <th>Variable</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% Object.entries(envVars).forEach(([key, value]) => { %>
+                                        <tr>
+                                            <td><%= key %></td>
+                                            <td class="value-cell">
+                                                <% if (typeof value === 'object' && value !== null) { %>
+                                                    <pre><%= JSON.stringify(value, null, 2) %></pre>
+                                                <% } else { %>
+                                                    <pre><%= value %></pre>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        <% } else { %>
+                            <p>No environment variables found.</p>
+                        <% } %>
+                    </div>
+
+                    <!-- Dependencies -->
+                    <div class="json-collapsible">Dependencies</div>
+                    <div class="json-content">
+                        <% if (dependencies) { %>
+                            <table class="table table-striped table-container">
+                                <thead>
+                                    <tr>
+                                        <th>Package</th>
+                                        <th>Version</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% Object.entries(dependencies).forEach(([pkg, version]) => { %>
+                                        <tr>
+                                            <td><%= pkg %></td>
+                                            <td><%= version %></td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        <% } else { %>
+                            <p>No dependencies found.</p>
+                        <% } %>
+                    </div>
+
+                    <!-- Dev Dependencies -->
+                    <div class="json-collapsible">Dev Dependencies</div>
+                    <div class="json-content">
+                        <% if (devDependencies) { %>
+                            <table class="table table-striped table-container">
+                                <thead>
+                                    <tr>
+                                        <th>Package</th>
+                                        <th>Version</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% Object.entries(devDependencies).forEach(([pkg, version]) => { %>
+                                        <tr>
+                                            <td><%= pkg %></td>
+                                            <td><%= version %></td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        <% } else { %>
+                            <p>No dev dependencies found.</p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+        <div class="footer">
+            <p>Powered by <a href="https://nodejs.org" target="_blank">Node.js</a>, <a href="https://expressjs.com" target="_blank">Express</a>, and <a href="https://ejs.co" target="_blank">EJS</a>, NodInfo Version <%= version %>.</p>
+        </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script>
+        // JavaScript for collapsible sections
+        document.querySelectorAll('.json-collapsible').forEach(item => {
+            item.addEventListener('click', () => {
+                const content = item.nextElementSibling;
+                if (content.style.display === 'block') {
+                    content.style.display = 'none';
+                } else {
+                    content.style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
