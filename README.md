@@ -37,24 +37,24 @@ node server.js
 
 The application will run at [http://127.0.0.1:3000/](http://127.0.0.1:3000/).
 
-### Routes
+## Routes
 
 - `/`: Home page, displaying a welcome message.
 - `/info`: Displays detailed system information.
 - `/neofetch`: Runs Neofetch and displays its output.
 - `/*`: Catches all other undefined routes and returns a `404 Error`.
 
-### Dependencies
+## Dependencies
 
 - `express`: Used for building the web server.
 - `systeminformation`: Used for retrieving system information.
 - `strip-ansi`: Used for removing ANSI color codes from the Neofetch output.
 - `ejs`: Used as the view engine for rendering HTML.
 
-### License
+## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-### Version
+## Version
 
 - Current Version: 0.1
